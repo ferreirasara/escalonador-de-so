@@ -15,7 +15,6 @@ void retornaHora(int[]);
 
 int main(void){
 	int quantum;
-	
 
 	PCB* processo1;
 	processo1 = geraProcesso();
