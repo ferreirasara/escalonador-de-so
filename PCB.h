@@ -1,17 +1,15 @@
-#include <stdbool.h>
-
 #ifndef PCB_H
 #define PCB_H
 
+#include <stdbool.h>
+
 struct pcb {
-	char* nome;
-	int situacao; // 1 - Termino do processo
-			      // 2 - Termino do quantum
-				  // 3 - E/S
-	int tempo_execucao; // Em ms
-	int status; // 1 - Pronto
-				// 2 - Executando
-				// 3 - Espera
+	int PID;			// Identificador do processo
+	int tempo_total;	// Em ms
+	int hr_entrada, min_entrada, sec_entrada;
+	int hr_saida, min_saida, sec_saida;
 };
 
-typedef pcb PCB;
+typedef struct pcb PCB;
+
+#endif
