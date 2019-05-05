@@ -11,7 +11,7 @@ Fila* cria_fila(void);
 void destroi_fila(Fila*);
 bool underflow_fila(const Fila*);
 void dump_fila(const Fila*);
-static ins_fim_fila(Fila*, const PCB*);
+void ins_fim_fila(Fila*, const PCB*);
 void rem_inicio_fila(Fila*, PCB*);
 
 #endif

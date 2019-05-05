@@ -12,6 +12,6 @@ void destroi_lista(Lista*);
 void dump_lista(const Lista*);
 bool underflow_lista(const Lista*);
 void ins_fim_lista(Lista*, const PCB*);
-void rem_fim_lista(Lista*, PCB*);
+void rem_processo_lista(Lista*, PCB*);
 
 #endif

@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "filagen.h"
 
 struct nodo {
 	PCB processo;
-	struct nodo proximo;
+	struct nodo* proximo;
 };
 typedef struct nodo Nodo;
 
-struct lista {
+struct fila {
 	Nodo* cauda;
 	size_t num_nodos;
 };
@@ -20,15 +21,15 @@ Fila* cria_fila(void) {
 	f->cauda = NULL;
 	f->num_nodos = 0;
 
-	return l;
+	return f;
 }
 
 void destroi_fila(Fila* f) {
-	while(!underflow(f)) {
+	while(!underflow_fila(f)) {
 		PCB dummy;
-		rem_fim(f, &dummy);
+		rem_inicio_fila(f, &dummy);
 	}
-	free(l);
+	free(f);
 }
 
 bool underflow_fila(const Fila* f) {
@@ -36,8 +37,8 @@ bool underflow_fila(const Fila* f) {
 }
 
 void dump_fila(const Fila* f) {
-	if (underflow(f)) {
-		printf("%10s\n", "NENHUM PROCESSO");
+	if (underflow_fila(f)) {
+		printf("NENHUM PROCESSO\n");
 		return;
 	}
 	int contador = 1;
@@ -45,22 +46,22 @@ void dump_fila(const Fila* f) {
 	Nodo* i = f->cauda;
 	do {
 		i = i->proximo;
-		printf("%7d%7s|%7d\n", contador, "", i->processo->PID);
+		printf("%7d%7s|%7d\n", contador, "", i->processo.PID);
 		++contador;
 	} while (i != f->cauda);
 }
 
-static ins_fim_fila(Fila* f, const PCB* p) {
+void ins_fim_fila(Fila* f, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
-	memcpy(&->processo, p, sizeof(p));
+	memcpy(&n->processo, p, sizeof(p));
 	if (f->cauda == NULL) {
 		n->proximo = n;
+		f->cauda = n;
 	} else {
 		n->proximo = f->cauda->proximo;
 		f->cauda->proximo = n;
 	}
-	++l->num_nodos;
-	return n;
+	++f->num_nodos;
 }
 
 void rem_inicio_fila(Fila* f, PCB* p) {
