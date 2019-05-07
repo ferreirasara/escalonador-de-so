@@ -67,10 +67,12 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 void rem_inicio_fila(Fila* f, PCB* p) {
 	Nodo* i = f->cauda->proximo;
 	memcpy(p, &i->processo, sizeof(PCB));
+	printf("%d\n",p->PID);
 	if (f->cauda == i) {
 		f->cauda = NULL;
 	} else {
 		f->cauda->proximo = i->proximo;
+
 	}
 	free(i);
 	--f->num_nodos;

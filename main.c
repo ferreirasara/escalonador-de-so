@@ -5,29 +5,32 @@
 #include "filagen.h"
 #include "listagen.h"
 #include "PCB.h"
+#include "hora.h"
 
+Hora* retornaHora();
 PCB* geraProcesso();
 bool geraSolicitacaoES();
 bool geraFimSolicitacaoES();
 int geraTempoUso();
-void retornaHora(int[]);
 void limpatela();
 
 
 int main(void){
 	srand((unsigned) time(NULL));
-	
-	int quantum, qtd_processos;
 
+	int quantum, qtd_processos;
+	Hora* hora_atual = retornaHora();
 	limpatela();
+	printf("%d:%d:%d\n", hora_atual->hr, hora_atual->min, hora_atual->sec);
 	printf("BEM VINDO!\n\n");
 	printf("Informe o número de processos: ");
 	scanf("%d", &qtd_processos);
 	printf("Informe a duracao do quantum (em ms): ");
-	scanf("%d", & quantum);
+	scanf("%d", &quantum);
 
-	Lista* espera = cria_lista();
+	Lista* em_espera = cria_lista();
 	Fila* pronto = cria_fila();
+	Fila* finalizado = cria_fila();
 
 	int i;
 	for (i = 0; i < qtd_processos; ++i) {
@@ -36,18 +39,29 @@ int main(void){
 		ins_fim_fila(pronto, novo);
 	}
 	dump_fila(pronto);
+
+	PCB* processo_da_vez;
+	rem_inicio_fila(pronto, processo_da_vez);
+	printf("PROCESSADOR\n");
+	printf("PID: %d\n", processo_da_vez->PID);
+	processo_da_vez->tempo_total -= quantum;
+	if (geraSolicitacaoES()) {
+		ins_fim_lista(em_espera, processo_da_vez);
+		printf("E/S\n");
+	}
+
+
 }
 
 PCB* geraProcesso() {
-	int hr[3];
-	retornaHora(hr);
-
+	Hora* hora_atual = retornaHora();
+	
 	PCB* new = malloc(sizeof(struct pcb));
 	new->PID = rand() % 1000;
-	new->tempo_total = rand() % 60;
-	new->hr_entrada = hr[0];
-	new->min_entrada = hr[1];
-	new->sec_entrada = hr[2];
+	new->tempo_total = rand() % 10000;
+	new->hr_entrada = hora_atual->hr;
+	new->min_entrada = hora_atual->min;
+	new->sec_entrada = hora_atual->sec;
 
 	return new;
 }
@@ -70,15 +84,16 @@ int geraTempoUso() {
 	return tempo_uso;
 }
 
-void retornaHora(int hr[]) {
-	struct tm *data_hora_atual;     
+Hora* retornaHora() {
+	Hora* atual = malloc(sizeof(struct hora));
+	struct tm *data_hora_atual;
 	time_t segundos;
-	time(&segundos);   
-	data_hora_atual = localtime(&segundos);  
+	time(&segundos);
+	data_hora_atual = localtime(&segundos);
 
-	hr[0] = data_hora_atual->tm_hour;
-	hr[1] = data_hora_atual->tm_min;
-	hr[2] = data_hora_atual->tm_sec;
+	atual->hr = data_hora_atual->tm_hour;
+	atual->min = data_hora_atual->tm_min;
+	atual->sec = data_hora_atual->tm_sec;
 }
 
 void limpatela() {
