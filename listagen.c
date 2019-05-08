@@ -53,7 +53,8 @@ void dump_lista(const Lista* l) {
 
 void ins_fim_lista(Lista* l, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
-	memcpy(&n->processo, p, sizeof(p));
+	memcpy(&n->processo, p, sizeof(PCB));
+	printf("%d\n", n->processo.PID);
 	if (l->cabeca == NULL) {
 		n->proximo = l->cabeca;
 		l->cabeca = n;
@@ -67,6 +68,7 @@ void ins_fim_lista(Lista* l, const PCB* p) {
 		n->proximo = NULL;
 		n->anterior = l->cauda;
 		n->anterior->proximo = n;
+		l->cauda = n;
 	}
 	++l->num_nodos;
 }

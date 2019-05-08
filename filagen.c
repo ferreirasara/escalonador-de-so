@@ -53,7 +53,7 @@ void dump_fila(const Fila* f) {
 
 void ins_fim_fila(Fila* f, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
-	memcpy(&n->processo, p, sizeof(p));
+	memcpy(&n->processo, p, sizeof(PCB));
 	if (f->cauda == NULL) {
 		n->proximo = n;
 		f->cauda = n;
@@ -67,7 +67,6 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 void rem_inicio_fila(Fila* f, PCB* p) {
 	Nodo* i = f->cauda->proximo;
 	memcpy(p, &i->processo, sizeof(PCB));
-	printf("%d\n",p->PID);
 	if (f->cauda == i) {
 		f->cauda = NULL;
 	} else {
@@ -76,4 +75,8 @@ void rem_inicio_fila(Fila* f, PCB* p) {
 	}
 	free(i);
 	--f->num_nodos;
+}
+
+int tamanho_fila(const Fila* f) {
+	return f->num_nodos;
 }

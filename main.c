@@ -19,9 +19,7 @@ int main(void){
 	srand((unsigned) time(NULL));
 
 	int quantum, qtd_processos;
-	Hora* hora_atual = retornaHora();
 	limpatela();
-	printf("%d:%d:%d\n", hora_atual->hr, hora_atual->min, hora_atual->sec);
 	printf("BEM VINDO!\n\n");
 	printf("Informe o número de processos: ");
 	scanf("%d", &qtd_processos);
@@ -37,20 +35,18 @@ int main(void){
 		PCB* novo;
 		novo = geraProcesso();
 		ins_fim_fila(pronto, novo);
-	}
+		}
+	printf("FILA DE ESTADO PRONTO\n");
 	dump_fila(pronto);
+	while (!underflow_fila(pronto)) {	
 
-	PCB* processo_da_vez;
-	rem_inicio_fila(pronto, processo_da_vez);
-	printf("PROCESSADOR\n");
-	printf("PID: %d\n", processo_da_vez->PID);
-	processo_da_vez->tempo_total -= quantum;
-	if (geraSolicitacaoES()) {
+		PCB* processo_da_vez = geraProcesso();
+		
+		rem_inicio_fila(pronto, processo_da_vez);
 		ins_fim_lista(em_espera, processo_da_vez);
-		printf("E/S\n");
 	}
-
-
+	printf("LISTA DE ESTADO EM ESPERA\n");
+	dump_lista(em_espera);
 }
 
 PCB* geraProcesso() {
@@ -67,7 +63,6 @@ PCB* geraProcesso() {
 }
 
 bool geraSolicitacaoES() {
-	srand((unsigned) time(NULL));
 	bool flag_gera_ES = rand() % 2;
 	return flag_gera_ES == 0 ? true : false;
 }
