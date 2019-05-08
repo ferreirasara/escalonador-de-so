@@ -9,15 +9,21 @@
 
 Hora* retornaHora();
 PCB* geraProcesso();
+PCB* geraProcessoVazio();
 bool geraSolicitacaoES();
 bool geraFimSolicitacaoES();
 int geraTempoUso();
 void limpatela();
+void exibeProcesso(PCB*);
 
 
 int main(void){
 	srand((unsigned) time(NULL));
+	Fila* pronto = cria_fila();
+	Fila* finalizado = cria_fila();
+	Lista* em_espera = cria_lista();
 
+	// Inicio do programa
 	int quantum, qtd_processos;
 	limpatela();
 	printf("BEM VINDO!\n\n");
@@ -25,28 +31,45 @@ int main(void){
 	scanf("%d", &qtd_processos);
 	printf("Informe a duracao do quantum (em ms): ");
 	scanf("%d", &quantum);
+	printf("-------------------------------------------------------\n");
+	limpatela();
 
-	Lista* em_espera = cria_lista();
-	Fila* pronto = cria_fila();
-	Fila* finalizado = cria_fila();
-
+	// Inicializa a lista com processos prontos, na quantidade informada pelo usuário
 	int i;
 	for (i = 0; i < qtd_processos; ++i) {
-		PCB* novo;
-		novo = geraProcesso();
+		PCB* novo = geraProcesso();
 		ins_fim_fila(pronto, novo);
-		}
+	}
+
+	
+
 	printf("FILA DE ESTADO PRONTO\n");
 	dump_fila(pronto);
-	while (!underflow_fila(pronto)) {	
-
-		PCB* processo_da_vez = geraProcesso();
-		
-		rem_inicio_fila(pronto, processo_da_vez);
-		ins_fim_lista(em_espera, processo_da_vez);
-	}
+	printf("-------------------------------------------------------\n");
+	PCB* processo_da_vez = geraProcessoVazio();
 	printf("LISTA DE ESTADO EM ESPERA\n");
 	dump_lista(em_espera);
+	printf("-------------------------------------------------------\n");
+	rem_inicio_fila(pronto, processo_da_vez);
+	ins_fim_lista(em_espera, processo_da_vez);
+	printf("-------------------------------------------------------\n");
+	printf("LISTA DE ESTADO EM ESPERA\n");
+	dump_lista(em_espera);
+	printf("-------------------------------------------------------\n");
+}
+
+PCB* geraProcessoVazio() {
+	PCB* new = malloc(sizeof(struct pcb));
+	new->PID = 0;
+	new->tempo_total = 0;
+	new->hr_entrada = 0;
+	new->min_entrada = 0;
+	new->sec_entrada = 0;
+	new->hr_saida = 0;
+	new->min_saida = 0;
+	new->sec_saida = 0;
+
+	return new;
 }
 
 PCB* geraProcesso() {
@@ -91,9 +114,12 @@ Hora* retornaHora() {
 	atual->sec = data_hora_atual->tm_sec;
 }
 
+void exibeProcesso(PCB* p) {
+	printf("PID: %d\n", p->PID);
+	printf("Tempo Total: %d\n", p->tempo_total);
+	printf("Hora Entrada: %02d:%02d:%02d\n", p->hr_entrada, p->min_entrada, p->sec_entrada);
+}
+
 void limpatela() {
-	int i;
-	for (i = 0; i < 50; ++i) {
-		printf("\n");
-	}
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }

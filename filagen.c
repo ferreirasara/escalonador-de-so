@@ -16,7 +16,7 @@ struct fila {
 };
 
 Fila* cria_fila(void) {
-	Fila* f;
+	Fila* f = malloc(sizeof(Fila));
 	
 	f->cauda = NULL;
 	f->num_nodos = 0;

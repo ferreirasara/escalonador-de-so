@@ -17,12 +17,11 @@ struct lista {
 	size_t num_nodos;
 };
 Lista* cria_lista(void) {
-	Lista* l;
+	Lista* l = malloc(sizeof(Lista));
 	
 	l->cauda = NULL;
 	l->cabeca = NULL;
 	l->num_nodos = 0;
-
 	return l;
 }
 void destroi_lista(Lista* l) {
@@ -48,13 +47,13 @@ void dump_lista(const Lista* l) {
 	for (i = l->cabeca; i != NULL; i = i->proximo) {
 		printf("%7d%7s|%7d\n", contador, "", i->processo.PID);
 		++contador;
+		return;
 	}
 }
 
 void ins_fim_lista(Lista* l, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
 	memcpy(&n->processo, p, sizeof(PCB));
-	printf("%d\n", n->processo.PID);
 	if (l->cabeca == NULL) {
 		n->proximo = l->cabeca;
 		l->cabeca = n;
