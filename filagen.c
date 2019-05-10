@@ -38,15 +38,19 @@ bool underflow_fila(const Fila* f) {
 
 void dump_fila(const Fila* f) {
 	if (underflow_fila(f)) {
-		printf("NENHUM PROCESSO\n");
+		printf("Nenhum Processo\n");
 		return;
 	}
 	int contador = 1;
-	printf("%-14s|%-14s\n", "  N PROCESSO", "    PID");
+	printf(" N° Processo | PID | Hora Inicio | Hora Fim | Tempo Restante\n");
 	Nodo* i = f->cauda;
 	do {
 		i = i->proximo;
-		printf("%7d%7s|%7d\n", contador, "", i->processo.PID);
+		printf("%7d      |", contador);
+		printf("%4d |", i->processo.PID);
+		printf("  %02d:%02d:%02d   |", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
+		printf(" %02d:%02d:%02d |", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
+		printf("%9d\n", i->processo.tempo_total);
 		++contador;
 	} while (i != f->cauda);
 }
@@ -65,6 +69,9 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 }
 
 void rem_inicio_fila(Fila* f, PCB* p) {
+	if (underflow_fila(f)) {
+		return;
+	}
 	Nodo* i = f->cauda->proximo;
 	memcpy(p, &i->processo, sizeof(PCB));
 	if (f->cauda == i) {

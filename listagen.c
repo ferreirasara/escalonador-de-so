@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 #include "listagen.h"
 
 struct nodo {
@@ -27,7 +28,7 @@ Lista* cria_lista(void) {
 void destroi_lista(Lista* l) {
 	while(!underflow_lista(l)) {
 		PCB dummy;
-		//rem_fim(l, &dummy);
+		// rem_fim_lista(l, &dummy);
 	}
 	free(l);
 }
@@ -38,41 +39,52 @@ bool underflow_lista(const Lista* l) {
 
 void dump_lista(const Lista* l) {
 	if (underflow_lista(l)) {
-		printf("NENHUM PROCESSO\n");
+		printf("Nenhum Processo\n");
 		return;
 	}
 	int contador = 1;
-	printf("%-14s|%-14s\n", "  N PROCESSO", "    PID");
-	Nodo* i;
-	for (i = l->cabeca; i != NULL; i = i->proximo) {
-		printf("%7d%7s|%7d\n", contador, "", i->processo.PID);
+	printf(" N° Processo | PID | Hora Inicio | Hora Fim | Tempo Restante\n");
+	Nodo* i = l->cabeca;
+	do {
+		printf("      %d      |", contador);
+		printf(" %3d |", i->processo.PID);
+		printf("  %02d:%02d:%02d   |", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
+		printf(" %02d:%02d:%02d |", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
+		printf("   %-3d\n", i->processo.tempo_total);
+		i = i->proximo;
 		++contador;
-		return;
-	}
+	} while (i != NULL);
+}
+
+void ins_inicio_lista(Lista* l, const PCB* p) {
+    Nodo* n = malloc(sizeof(Nodo));
+    memcpy(&n->processo, p, sizeof(PCB));
+    n->proximo = l->cabeca;
+    l->cabeca = n;
+    ++l->num_nodos;
+
+    n->anterior = NULL;
+    if (n->proximo != NULL) {
+       n->proximo->anterior = n;
+    } else {
+        l->cauda = n;
+    }
 }
 
 void ins_fim_lista(Lista* l, const PCB* p) {
-	Nodo* n = malloc(sizeof(Nodo));
-	memcpy(&n->processo, p, sizeof(PCB));
-	if (l->cabeca == NULL) {
-		n->proximo = l->cabeca;
-		l->cabeca = n;
-		n->anterior = NULL;
-		if (n->proximo != NULL) {
-			n->proximo->anterior = n;
-		} else {
-			l->cauda = n;
-		}
-	} else {
-		n->proximo = NULL;
-		n->anterior = l->cauda;
-		n->anterior->proximo = n;
-		l->cauda = n;
-	}
-	++l->num_nodos;
+    if (underflow_lista(l)) {
+        ins_inicio_lista(l, p);
+        return;
+    }
+    Nodo* n = malloc(sizeof(Nodo));
+    memcpy(&n->processo, p, sizeof(PCB));
+    n->proximo = NULL;
+    n->anterior = l->cauda;
+    n->anterior->proximo = n;
+    ++l->num_nodos;
 }
 
-void rem_processo_lista(Lista* l, PCB* p) {
+PCB* rem_processo_lista(Lista* l, PCB* p) {
 	Nodo* i = l->cabeca;
 	while (i != NULL) {
 		if (memcmp(&i->processo, p, sizeof(PCB))) {
@@ -87,6 +99,7 @@ void rem_processo_lista(Lista* l, PCB* p) {
 				l->cauda = i->anterior;
 			}
 			Nodo* x = i;
+			return &i->processo;
 			i = i->proximo;
 			free(x);
 			--l->num_nodos;
@@ -94,4 +107,29 @@ void rem_processo_lista(Lista* l, PCB* p) {
 			i = i->proximo;
 		}
 	}
+}
+
+bool fimES(Lista* l, PCB* p) {
+	PCB* retorno;
+	Nodo* i = l->cabeca;
+	while (i != NULL) {
+		if(geraFimSolicitacaoES()) {
+			retorno = rem_processo_lista(l, &i->processo);
+			memcpy(p, retorno, sizeof(PCB));
+			return true;
+		} else {
+			i = i->proximo;
+		}
+	}
+	return false;
+}
+
+int tamanho_lista(const Lista* l) {
+	return l->num_nodos;
+}
+
+bool geraFimSolicitacaoES() {
+	srand((unsigned) time(NULL));
+	int flag_fim_ES = rand() % 3;
+	return flag_fim_ES == 1 ? true : false;
 }
