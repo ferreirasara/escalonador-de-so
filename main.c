@@ -18,6 +18,7 @@
 Hora* retornaHora();
 PCB* geraProcesso();
 PCB* geraProcessoVazio();
+void finalizaProcesso(PCB*);
 bool geraSolicitacaoES();
 bool geraFimSolicitacaoES();
 void limpaTela();
@@ -32,15 +33,15 @@ int main(void){
 
 	// Inicio do programa
 	Hora* hr_inicio = retornaHora();
-	int quantum = 5, qtd_processos = 5;
+	int quantum, qtd_processos;
 	limpaTela();
-	// printf("BEM VINDO!\n\n");
-	// printf("Informe o número de processos: ");
-	// scanf("%d", &qtd_processos);
-	// printf("Informe a duracao do quantum (em ms): ");
-	// scanf("%d", &quantum);
-	// printf("--------------------------------------------------------------\n");
-	// limpaTela();
+	printf("BEM VINDO!\n\n");
+	printf("Informe o número de processos: ");
+	scanf("%d", &qtd_processos);
+	printf("Informe a duracao do quantum (em ms): ");
+	scanf("%d", &quantum);
+	printf("--------------------------------------------------------------\n");
+	limpaTela();
 
 	// Inicializa a lista com processos prontos, na quantidade informada pelo usuário
 	int i;
@@ -53,6 +54,7 @@ int main(void){
 		printf(RESET"\nInicio do programa: %02d:%02d:%02d\n", hr_inicio->hr, hr_inicio->min, hr_inicio->sec);
 		printf(RED "--------------------------------------------------------------\n");
 		printf(BOLD"\t\t\tPROCESSOS PRONTOS\n"RESET RED);
+		printf("QTD de processos: %d\n", tamanho_fila(pronto));
 		dump_fila(pronto);
 		
 		printf(RESET YELLOW "--------------------------------------------------------------\n");
@@ -63,28 +65,43 @@ int main(void){
 		printf(BOLD"\t\t      PROCESSOS FINALIZADOS\n"RESET GREEN);
 		dump_fila(finalizado);
 		printf(RESET BLUE"--------------------------------------------------------------\n");
+		
+		// Cria um novo processo, que sera trabalhado mais adiante
 		PCB* processo_da_vez;
+		// Pega o primeiro processo da fila de processos prontos
 		rem_inicio_fila(pronto, processo_da_vez);
 		// Se o processo pedir ES vai para lista em espera
 		if (geraSolicitacaoES()) {
+			printf("O processo %d solicitou E/S\n", processo_da_vez->PID);
+			printf("--------------------------------------------------------------\n");
 			ins_inicio_lista(em_espera, processo_da_vez);
 		} else {
 			// Se não, vai para o processador, diminui o tempo total de execução e volta para fila pronto
+			printf("O processo %d foi para o processador\n", processo_da_vez->PID);
+			printf("--------------------------------------------------------------\n");
 			processo_da_vez->tempo_total -= quantum;
 			ins_fim_fila(pronto, processo_da_vez);
 		}
 		if (processo_da_vez->tempo_total <= 0) {
+			printf("O processo %d terminou sua execucao\n", processo_da_vez->PID);
+			printf("--------------------------------------------------------------\n");
+			finalizaProcesso(processo_da_vez);
 			ins_fim_fila(finalizado, processo_da_vez);
-		} else {
-			ins_fim_fila(pronto, processo_da_vez);
 		}
 		if (fimES(em_espera, processo_da_vez)) {
+			printf("O processo %d teve uma resposta para E/S\n", processo_da_vez->PID);
+			printf("--------------------------------------------------------------\n");
 			ins_fim_fila(pronto, processo_da_vez);
 		}
-		printf("Pressione qualquer tecla para continuar: ");
+		printf(RESET"Pressione qualquer tecla para continuar: ");
 		char next;
 		scanf(" %c", &next);
 	}
+	limpaTela();
+	printf(BOLD RED"\t\t\tRESUMO\n"RESET);
+	printf(RED"--------------------------------------------------------------\n");
+	dump_fila(finalizado);
+	printf("--------------------------------------------------------------\n"RESET);
 }
 
 PCB* geraProcesso() {
@@ -98,6 +115,13 @@ PCB* geraProcesso() {
 	new->sec_entrada = hora_atual->sec;
 
 	return new;
+}
+
+void finalizaProcesso(PCB* p) {
+	Hora* hora_atual = retornaHora();
+	p->hr_saida = hora_atual->hr;
+	p->min_saida = hora_atual->min;
+	p->sec_saida = hora_atual->sec;
 }
 
 bool geraSolicitacaoES() {

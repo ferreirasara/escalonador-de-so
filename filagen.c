@@ -64,6 +64,7 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 	} else {
 		n->proximo = f->cauda->proximo;
 		f->cauda->proximo = n;
+		f->cauda = n;
 	}
 	++f->num_nodos;
 }
@@ -78,7 +79,6 @@ void rem_inicio_fila(Fila* f, PCB* p) {
 		f->cauda = NULL;
 	} else {
 		f->cauda->proximo = i->proximo;
-
 	}
 	free(i);
 	--f->num_nodos;
