@@ -50,7 +50,7 @@ void dump_lista(const Lista* l) {
 		printf(" %3d |", i->processo.PID);
 		printf("  %02d:%02d:%02d   |", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
 		printf(" %02d:%02d:%02d |", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
-		printf("%9d\n", i->processo.tempo_total);
+		printf("%9ds\n", i->processo.tempo_total);
 		i = i->proximo;
 		++contador;
 	} while (i != NULL);
@@ -59,10 +59,6 @@ void dump_lista(const Lista* l) {
 void ins_inicio_lista(Lista* l, const PCB* p) {
     Nodo* n = malloc(sizeof(Nodo));
     memcpy(&n->processo, p, sizeof(PCB));
-    printf("Cabeca: %p\n", l->cabeca);
-    printf("Cauda: %p\n", l->cauda);
-    printf("Prox: %p\n", n->proximo);
-    printf("Ant: %p\n", n->anterior);
    	n->proximo = l->cabeca;
    	l->cabeca = n;
    	n->anterior = NULL;
@@ -133,6 +129,6 @@ int tamanho_lista(const Lista* l) {
 
 bool geraFimSolicitacaoES() {
 	srand((unsigned) time(NULL));
-	int flag_fim_ES = rand() % 3;
+	int flag_fim_ES = rand() % 50;
 	return flag_fim_ES == 1 ? true : false;
 }

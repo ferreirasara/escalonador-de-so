@@ -4,7 +4,9 @@
 #include <stdbool.h>
 
 struct hora {
-	int hr, min, sec;
+	int hr;
+	int min;
+	int sec;
 };
 
 typedef struct hora Hora;
