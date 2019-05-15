@@ -81,8 +81,8 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
 	memcpy(&n->processo, p, sizeof(PCB));
 	if (f->cauda == NULL) {
-		n->proximo = n;
 		f->cauda = n;
+		n->proximo = n;
 	} else {
 		n->proximo = f->cauda->proximo;
 		f->cauda->proximo = n;
@@ -90,13 +90,11 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 	}
 	++f->num_nodos;
 }
-
 void rem_inicio_fila(Fila* f, PCB* p) {
 	if (underflow_fila(f)) {
 		return;
 	}
 	Nodo* i = f->cauda->proximo;
-	printf("%p\n", f->cauda->proximo);
 	memcpy(p, &i->processo, sizeof(PCB));
 	if (f->cauda == i) {
 		f->cauda = NULL;

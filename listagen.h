@@ -14,7 +14,7 @@ void dump_lista(const Lista*);
 bool underflow_lista(const Lista*);
 void ins_fim_lista(Lista*, const PCB*);
 void ins_inicio_lista(Lista*, const PCB*);
-PCB* rem_processo_lista(Lista*, PCB*);
+void rem_processo_lista(Lista*, PCB*, PCB*);
 int tamanho_lista(const Lista*);
 bool geraFimSolicitacaoES();
 bool fimES(Lista*, PCB*);

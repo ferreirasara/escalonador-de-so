@@ -70,38 +70,42 @@ void ins_inicio_lista(Lista* l, const PCB* p) {
 	}	
 }
 
-void ins_fim_lista(Lista* l, const PCB* p) {
-    if (underflow_lista(l)) {
-        ins_inicio_lista(l, p);
-        return;
-    }
-    Nodo* n = malloc(sizeof(Nodo));
-    memcpy(&n->processo, p, sizeof(PCB));
-    n->proximo = NULL;
-    n->anterior = l->cauda;
-    n->anterior->proximo = n;
-    ++l->num_nodos;
-}
+// void ins_fim_lista(Lista* l, const PCB* p) {
+//     if (underflow_lista(l)) {
+//         ins_inicio_lista(l, p);
+//         return;
+//     }
+//     Nodo* n = malloc(sizeof(Nodo));
+//     memcpy(&n->processo, p, sizeof(PCB));
+//     n->proximo = NULL;
+//     n->anterior = l->cauda;
+//     n->anterior->proximo = n;
+//     ++l->num_nodos;
+// }
 
-PCB* rem_processo_lista(Lista* l, PCB* p) {
+void rem_processo_lista(Lista* l, PCB* p, PCB* r) {
 	Nodo* i = l->cabeca;
 	while (i != NULL) {
-		if (memcmp(&i->processo, p, sizeof(PCB))) {
+		printf("i: %p\n", i);
+		if (memcmp(&i->processo, p, sizeof(PCB)) == 0) {
 			if (i->anterior != NULL) {
+				printf("i->anterior: %p\n", i->anterior);
 				i->anterior->proximo = i->proximo;
 			} else {
+				printf("i->anterior: %p\n", i->anterior);
 				l->cabeca = i->proximo;
 			}
 			if (i->proximo != NULL) {
+				printf("i->proximo: %p\n", i->proximo);
 				i->proximo->anterior = i->anterior;
 			} else {
+				printf("i->proximo: %p\n", i->proximo);
 				l->cauda = i->anterior;
 			}
-			Nodo* x = i;
-			return &i->processo;
-			i = i->proximo;
-			free(x);
 			--l->num_nodos;
+			memcpy(r, p, sizeof(PCB));
+			free(i);
+			return;
 		} else {
 			i = i->proximo;
 		}
@@ -109,12 +113,12 @@ PCB* rem_processo_lista(Lista* l, PCB* p) {
 }
 
 bool fimES(Lista* l, PCB* p) {
-	PCB* retorno;
+	// PCB* retorno;
 	Nodo* i = l->cabeca;
 	while (i != NULL) {
 		if(geraFimSolicitacaoES()) {
-			retorno = rem_processo_lista(l, &i->processo);
-			memcpy(p, retorno, sizeof(PCB));
+			rem_processo_lista(l, &i->processo, p);
+			// memcpy(p, retorno, sizeof(PCB));
 			return true;
 		} else {
 			i = i->proximo;
@@ -129,6 +133,6 @@ int tamanho_lista(const Lista* l) {
 
 bool geraFimSolicitacaoES() {
 	srand((unsigned) time(NULL));
-	int flag_fim_ES = rand() % 50;
+	int flag_fim_ES = rand() % 2;
 	return flag_fim_ES == 1 ? true : false;
 }
