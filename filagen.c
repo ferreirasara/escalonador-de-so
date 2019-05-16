@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "filagen.h"
+#include "hora.h"
 
 struct nodo {
 	PCB processo;
@@ -38,48 +39,54 @@ bool underflow_fila(const Fila* f) {
 
 void dump_fila(const Fila* f) {
 	if (underflow_fila(f)) {
-		printf("Nenhum Processo\n");
+		printf("║ Nenhum Processo                                                            ║\n");
 		return;
 	}
 	int contador = 1;
-	printf(" N° Processo | PID | Hora Inicio | Hora Fim | Tempo Restante\n");
+	printf("║ N° Processo │ PID │ Hora Inicio │ Hora Fim │ Tempo Restante                ║\n");
+	printf("║ ────────────┼─────┼─────────────┼──────────┼───────────────                ║\n");
 	Nodo* i = f->cauda;
 	do {
 		i = i->proximo;
-		printf("%7d      |", contador);
-		printf("%4d |", i->processo.PID);
-		printf("  %02d:%02d:%02d   |", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
-		printf(" %02d:%02d:%02d |", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
-
-		printf("%9ds\n", i->processo.tempo_total);
+		printf("║ %11d │", contador);
+		printf(" %3d │", i->processo.PID);
+		printf("    %02d:%02d:%02d │", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
+		printf(" %02d:%02d:%02d │", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
+		printf("%13ds                 ║\n", i->processo.tempo_total);
 		++contador;
 	} while (i != f->cauda);
 }
 void dump_fila_finalizado(const Fila* f) {
 	if (underflow_fila(f)) {
-		printf("Nenhum Processo\n");
+		printf("║ Nenhum Processo                                                            ║\n");
 		return;
 	}
 	int contador = 1;
 	int tempo_processador = 0;
-	printf(" N° Processo | PID | Hora Inicio | Hora Fim | Tempo Total \n");
+	printf("║ N° Processo │ PID │ Hora Inicio │ Hora Fim │ Tempo Total │ Tempo em Espera ║\n");
+	printf("║ ────────────┼─────┼─────────────┼──────────┼─────────────┼──────────────── ║\n");
 	Nodo* i = f->cauda;
 	do {
 		i = i->proximo;
-		printf("%7d      |", contador);
-		printf("%4d |", i->processo.PID);
-		printf("  %02d:%02d:%02d   |", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
-		printf(" %02d:%02d:%02d |", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
-		printf(" %5ds\n", i->processo.tempo_gasto);
+		printf("║ %11d │", contador);
+		printf(" %3d │", i->processo.PID);
+		printf("    %02d:%02d:%02d │", i->processo.hr_entrada, i->processo.min_entrada, i->processo.sec_entrada);
+		printf(" %02d:%02d:%02d │", i->processo.hr_saida, i->processo.min_saida, i->processo.sec_saida);
+		printf(" %10ds │", i->processo.tempo_gasto);
+		printf(" %14ds ║\n", i->processo.tempo_espera);
 		++contador;
 		tempo_processador += i->processo.tempo_gasto;
 	} while (i != f->cauda);
-	printf("Tempo acumulado da ultilizacao do processador: %ds\n", tempo_processador);
+	printf("║ Tempo acumulado da ultilizacao do processador: %3ds                        ║\n", tempo_processador);
 }
 
 void ins_fim_fila(Fila* f, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
 	memcpy(&n->processo, p, sizeof(PCB));
+	Hora* hora_atual = retornaHora();
+	n->processo.hr_entrada_fila = hora_atual->hr;
+	n->processo.min_entrada_fila = hora_atual->min;
+	n->processo.sec_entrada_fila = hora_atual->sec;
 	if (f->cauda == NULL) {
 		f->cauda = n;
 		n->proximo = n;
@@ -96,6 +103,11 @@ void rem_inicio_fila(Fila* f, PCB* p) {
 	}
 	Nodo* i = f->cauda->proximo;
 	memcpy(p, &i->processo, sizeof(PCB));
+	Hora* hora_atual = retornaHora();
+	int sec_entrada = (p->hr_entrada * 3600) + (p->min_entrada * 60) + (p->sec_entrada);
+	int sec_saida = (hora_atual->hr * 3600) + (hora_atual->min * 60) + (hora_atual->sec);
+	p->tempo_espera = sec_saida - sec_entrada;
+
 	if (f->cauda == i) {
 		f->cauda = NULL;
 	} else {

@@ -11,4 +11,6 @@ struct hora {
 
 typedef struct hora Hora;
 
+Hora* retornaHora();
+
 #endif

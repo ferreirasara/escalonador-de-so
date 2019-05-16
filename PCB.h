@@ -8,8 +8,10 @@ struct pcb {
 	int tempo_total;	// Em s
 	int hr_entrada, min_entrada, sec_entrada;
 	int hr_saida, min_saida, sec_saida;
+	int hr_entrada_fila, min_entrada_fila, sec_entrada_fila;
+	// int hr_saida_fila, min_saida_fila, sec_saida_fila;
 	int tempo_gasto;
-	double tempo_espera;
+	int tempo_espera;
 };
 
 typedef struct pcb PCB;
