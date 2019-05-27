@@ -8,6 +8,7 @@
 #include "PCB.h"
 #include "hora.h"
 
+// Definicao das cores que serao usadas
 #define RED     "\x1b[31m"
 #define GREEN	"\e[0;32m"
 #define YELLOW	"\033[33m"
@@ -16,24 +17,24 @@
 #define BLINK	"\033[5m"
 #define RESET   "\x1b[0m"
 
+// Prototipo das funcoes
 PCB* geraProcesso();
 PCB* geraProcessoVazio();
 void finalizaProcesso(PCB*);
 bool geraSolicitacaoES();
 bool geraFimSolicitacaoES();
 void limpaTela();
-void exibeProcesso(PCB*);
-
 
 int main(void){
 	srand((unsigned) time(NULL));
-	Fila* pronto = cria_fila();
-	Fila* finalizado = cria_fila();
-	Lista* em_espera = cria_lista();
+	// criacao das listas e filas
+	Fila* pronto = criaFila();
+	Fila* finalizado = criaFila();
+	Lista* em_espera = criaLista();
 
 	// Inicio do programa
 	Hora* hr_inicio = retornaHora();
-	int quantum = 10, qtd_processos = 3;
+	int quantum, qtd_processos;
 	limpaTela();
 	printf(YELLOW"╔══════════════════════════════════════════════════════════╗\n");
 	puts("║                     _                       _            ║");
@@ -60,84 +61,82 @@ int main(void){
 	int i;
 	for (i = 0; i < qtd_processos; ++i) {
 		PCB* novo = geraProcesso();
-		ins_fim_fila(pronto, novo);
+		insFimFila(pronto, novo);
 	}
 	// Executa o programa enquanto existir processos para rodar
-	while (tamanho_fila(finalizado) < qtd_processos) {
+	while (tamanhoFila(finalizado) < qtd_processos) {
 		limpaTela();
 		printf(RESET"\nInicio do programa: %02d:%02d:%02d\n", hr_inicio->hr, hr_inicio->min, hr_inicio->sec);
 		printf(RED"╔════════════════════════════════════════════════════════════════════════════╗\n");
 		printf(BOLD"║                             PROCESSOS PRONTOS                              ║\n"RESET RED);
 		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
-		printf("║ QTD de processos: %3d                                                      ║\n", tamanho_fila(pronto));
-		dump_fila(pronto);
+		printf("║ QTD de processos: %3d                                                      ║\n", tamanhoFila(pronto));
+		dumpFila(pronto);
 		
 		printf(RESET YELLOW "╠════════════════════════════════════════════════════════════════════════════╣\n");
 		printf(BOLD"║                            PROCESSOS EM ESPERA                             ║\n"RESET YELLOW);
 		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
-		printf("║ QTD de processos: %3d                                                      ║\n", tamanho_lista(em_espera));
-		dump_lista(em_espera);
+		printf("║ QTD de processos: %3d                                                      ║\n", tamanhoLista(em_espera));
+		dumpLista(em_espera);
 
 		printf(RESET GREEN"╠════════════════════════════════════════════════════════════════════════════╣\n");
 		printf(BOLD"║                           PROCESSOS FINALIZADOS                            ║\n"RESET GREEN);
 		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
-		printf("║ QTD de processos: %3d                                                      ║\n", tamanho_fila(finalizado));
-		dump_fila_finalizado(finalizado);
+		printf("║ QTD de processos: %3d                                                      ║\n", tamanhoFila(finalizado));
+		dumpFilaFinalizado(finalizado);
 		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
 		
 		// Cria um novo processo, que sera trabalhado mais adiante
 		PCB* processo_da_vez = malloc(sizeof(struct pcb));
-		// PCB* processo_em_espera = malloc(sizeof(struct pcb));
 		// Pega o primeiro processo da fila de processos prontos
-		if (!underflow_fila(pronto)) {
+		if (!underflowFila(pronto)) {
 			// Pega o primeiro processo da fila e o coloca no processador
-			rem_inicio_fila(pronto, processo_da_vez);
+			remInicioFila(pronto, processo_da_vez);
 			printf(RESET"║ O processo %3d foi para o processador                                      ║\n", processo_da_vez->PID);
 			int contador = 0;
 			bool solicitou = false;
-			bool saiu_espera = false;
 			while (contador <= quantum) {
 				contador++;
 				sleep(1);
 				if (processo_da_vez->tempo_total == contador) {
+					// desconta do tempo total o tempo que o processo ficou no processador
 					processo_da_vez->tempo_total -= contador;
 					break;
 				} else if (geraSolicitacaoES()) {
 					printf("║ O processo %3d solicitou E/S                                               ║\n", processo_da_vez->PID);
+					// desconta do tempo total o tempo que o processo ficou no processador
 					processo_da_vez->tempo_total -= contador;
-					ins_inicio_lista(em_espera, processo_da_vez);
+					// coloca o processo na lista de espera
+					insInicioLista(em_espera, processo_da_vez);
 					solicitou = true;
 					break;
 				} 
-				// else if (fimES(em_espera, processo_da_vez)) {
-		 	// 		printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
-		 	// 		ins_fim_fila(pronto, processo_da_vez);
-		 	// 		saiu_espera = true;
-		 	// 		break;
-				// }
 			}
-			// desconta do tempo total o tempo que o processo ficou no processador
 			printf("║ O processo %3d executou por %3ds. Seu \"tamanho\" diminuiu para %3d.         ║\n", processo_da_vez->PID, contador, processo_da_vez->tempo_total);
 			if (processo_da_vez->tempo_total <= 0) {
+				// se o processo terminou a execucao, o coloca na fila dos processos finalizados
 				printf("║ O processo %3d terminou sua execucao                                       ║\n", processo_da_vez->PID);
 				finalizaProcesso(processo_da_vez);
-				ins_fim_fila(finalizado, processo_da_vez);
+				insFimFila(finalizado, processo_da_vez);
 			} else if (!solicitou) {
 				// se o processo nao solicitou E/S e ainda não foi atendido, volta para a fila pronto
-				ins_fim_fila(pronto, processo_da_vez);
-			} else if (!underflow_lista(em_espera)) {
+				processo_da_vez->tempo_total -=contador;
+				insFimFila(pronto, processo_da_vez);
+			} else if (!underflowLista(em_espera)) {
+				// se a lista de espera nao esta vazia, existe a possibilidade de um processo ter uma resposta para E/S
 				if (fimES(em_espera, processo_da_vez)) {
 					printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
-					ins_fim_fila(pronto, processo_da_vez);
-					saiu_espera = true;
+					insFimFila(pronto, processo_da_vez);
 				}
 			}
 		} else {
+			// se a fila dos processos prontos esta vazia, e a fila dos finalizados nao esta cheia, existe processos em espera
 			printf(RESET"║ Aguardando E/S de um dos processos                                         ║\n");
+			// ate um processo receber uma resposta E/S
 			while (true) {
 				if (fimES(em_espera, processo_da_vez)) {
 					printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
-					ins_fim_fila(pronto, processo_da_vez);
+					insFimFila(pronto, processo_da_vez);
 					break;
 				}
 			}
@@ -154,8 +153,12 @@ int main(void){
 	limpaTela();
 	printf(BOLD "\t\t\tRESUMO\n"RESET);
 	printf(GREEN"╔════════════════════════════════════════════════════════════════════════════╗\n");
-	dump_fila_finalizado(finalizado);
+	dumpFilaFinalizado(finalizado);
 	printf("╚════════════════════════════════════════════════════════════════════════════╝\n"RESET);
+
+	destroiFila(finalizado);
+	destroiFila(pronto);
+	destroiLista(em_espera);
 }
 
 PCB* geraProcesso() {
@@ -163,6 +166,7 @@ PCB* geraProcesso() {
 	
 	PCB* new = malloc(sizeof(struct pcb));
 	new->PID = rand() % 1000;
+	// + 1 para nao ter processos com tempo igual a zero
 	new->tempo_total = rand() % 10 + 1;
 	new->hr_entrada = hora_atual->hr;
 	new->min_entrada = hora_atual->min;
@@ -176,8 +180,10 @@ void finalizaProcesso(PCB* p) {
 	p->hr_saida = hora_atual->hr;
 	p->min_saida = hora_atual->min;
 	p->sec_saida = hora_atual->sec;
+	// transforma o tempo em segundos para poder calcular
 	int sec_entrada = (p->hr_entrada * 3600) + (p->min_entrada * 60) + (p->sec_entrada);
 	int sec_saida = (p->hr_saida * 3600) + (p->min_saida * 60) + (p->sec_saida);
+	// faz o calculo do tempo total
 	p->tempo_gasto = sec_saida - sec_entrada;
 }
 
@@ -186,12 +192,6 @@ bool geraSolicitacaoES() {
 	return flag_gera_ES == 0 ? true : false;
 }
 
-void exibeProcesso(PCB* p) {
-	printf("PID: %d\n", p->PID);
-	printf("Tempo Total: %d\n", p->tempo_total);
-	printf("Hora Entrada: %02d:%02d:%02d\n", p->hr_entrada, p->min_entrada, p->sec_entrada);
-}
-
 void limpaTela() {
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }

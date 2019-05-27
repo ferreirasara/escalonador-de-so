@@ -8,15 +8,16 @@
 
 typedef struct lista Lista;
 
-Lista* cria_lista(void);
-void destroi_lista(Lista*);
-void dump_lista(const Lista*);
-bool underflow_lista(const Lista*);
-void ins_fim_lista(Lista*, const PCB*);
-void ins_inicio_lista(Lista*, const PCB*);
-void rem_processo_lista(Lista*, PCB*, PCB*);
-int tamanho_lista(const Lista*);
-bool geraFimSolicitacaoES();
+Lista* criaLista(void);
 bool fimES(Lista*, PCB*);
+bool geraFimSolicitacaoES();
+bool underflowLista(const Lista*);
+int tamanhoLista(const Lista*);
+void destroiLista(Lista*);
+void dumpLista(const Lista*);
+void insFimLista(Lista*, const PCB*);
+void insInicioLista(Lista*, const PCB*);
+void remInicioLista(Lista*, PCB*);
+void remProcessoLista(Lista*, PCB*, PCB*);
 
 #endif

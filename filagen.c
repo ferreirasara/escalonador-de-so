@@ -5,6 +5,7 @@
 #include "filagen.h"
 #include "hora.h"
 
+// definicao do "noh" da fila
 struct nodo {
 	PCB processo;
 	struct nodo* proximo;
@@ -16,7 +17,7 @@ struct fila {
 	size_t num_nodos;
 };
 
-Fila* cria_fila(void) {
+Fila* criaFila(void) {
 	Fila* f = malloc(sizeof(Fila));
 	
 	f->cauda = NULL;
@@ -25,20 +26,20 @@ Fila* cria_fila(void) {
 	return f;
 }
 
-void destroi_fila(Fila* f) {
-	while(!underflow_fila(f)) {
+void destroiFila(Fila* f) {
+	while(!underflowFila(f)) {
 		PCB dummy;
-		rem_inicio_fila(f, &dummy);
+		remInicioFila(f, &dummy);
 	}
 	free(f);
 }
 
-bool underflow_fila(const Fila* f) {
+bool underflowFila(const Fila* f) {
 	return f->cauda == NULL;
 }
 
-void dump_fila(const Fila* f) {
-	if (underflow_fila(f)) {
+void dumpFila(const Fila* f) {
+	if (underflowFila(f)) {
 		printf("║ Nenhum Processo                                                            ║\n");
 		return;
 	}
@@ -56,8 +57,8 @@ void dump_fila(const Fila* f) {
 		++contador;
 	} while (i != f->cauda);
 }
-void dump_fila_finalizado(const Fila* f) {
-	if (underflow_fila(f)) {
+void dumpFilaFinalizado(const Fila* f) {
+	if (underflowFila(f)) {
 		printf("║ Nenhum Processo                                                            ║\n");
 		return;
 	}
@@ -80,10 +81,11 @@ void dump_fila_finalizado(const Fila* f) {
 	printf("║ Tempo acumulado da ultilizacao do processador: %3ds                        ║\n", tempo_processador);
 }
 
-void ins_fim_fila(Fila* f, const PCB* p) {
+void insFimFila(Fila* f, const PCB* p) {
 	Nodo* n = malloc(sizeof(Nodo));
 	memcpy(&n->processo, p, sizeof(PCB));
 	Hora* hora_atual = retornaHora();
+	// necessario para calcular o tempo em espera (conta o tempo na fila de pronto)
 	n->processo.hr_entrada_fila = hora_atual->hr;
 	n->processo.min_entrada_fila = hora_atual->min;
 	n->processo.sec_entrada_fila = hora_atual->sec;
@@ -97,15 +99,17 @@ void ins_fim_fila(Fila* f, const PCB* p) {
 	}
 	++f->num_nodos;
 }
-void rem_inicio_fila(Fila* f, PCB* p) {
-	if (underflow_fila(f)) {
+void remInicioFila(Fila* f, PCB* p) {
+	if (underflowFila(f)) {
 		return;
 	}
 	Nodo* i = f->cauda->proximo;
 	memcpy(p, &i->processo, sizeof(PCB));
 	Hora* hora_atual = retornaHora();
+	// transforma em segundos para poder calcular o tempo
 	int sec_entrada = (p->hr_entrada * 3600) + (p->min_entrada * 60) + (p->sec_entrada);
 	int sec_saida = (hora_atual->hr * 3600) + (hora_atual->min * 60) + (hora_atual->sec);
+	// tempo total em espera
 	p->tempo_espera = sec_saida - sec_entrada;
 
 	if (f->cauda == i) {
@@ -117,6 +121,6 @@ void rem_inicio_fila(Fila* f, PCB* p) {
 	--f->num_nodos;
 }
 
-int tamanho_fila(const Fila* f) {
+int tamanhoFila(const Fila* f) {
 	return f->num_nodos;
 }

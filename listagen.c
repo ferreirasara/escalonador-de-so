@@ -6,6 +6,7 @@
 #include "listagen.h"
 #include "hora.h"
 
+// define o "noh" da lista
 struct nodo {
 	PCB processo;
 	struct nodo* proximo;
@@ -18,7 +19,7 @@ struct lista {
 	Nodo* cauda;
 	size_t num_nodos;
 };
-Lista* cria_lista(void) {
+Lista* criaLista(void) {
 	Lista* l = malloc(sizeof(Lista));
 	
 	l->cauda = NULL;
@@ -26,20 +27,20 @@ Lista* cria_lista(void) {
 	l->num_nodos = 0;
 	return l;
 }
-void destroi_lista(Lista* l) {
-	while(!underflow_lista(l)) {
+void destroiLista(Lista* l) {
+	while(!underflowLista(l)) {
 		PCB dummy;
-		// rem_fim_lista(l, &dummy);
+		remInicioLista(l, &dummy);
 	}
 	free(l);
 }
 
-bool underflow_lista(const Lista* l) {
+bool underflowLista(const Lista* l) {
 	return l->cabeca == NULL;
 }
 
-void dump_lista(const Lista* l) {
-	if (underflow_lista(l)) {
+void dumpLista(const Lista* l) {
+	if (underflowLista(l)) {
 		printf("║ Nenhum Processo                                                            ║\n");
 		return;
 	}
@@ -58,7 +59,7 @@ void dump_lista(const Lista* l) {
 	} while (i != NULL);
 }
 
-void ins_inicio_lista(Lista* l, const PCB* p) {
+void insInicioLista(Lista* l, const PCB* p) {
     Nodo* n = malloc(sizeof(Nodo));
     memcpy(&n->processo, p, sizeof(PCB));
    	n->proximo = l->cabeca;
@@ -72,9 +73,9 @@ void ins_inicio_lista(Lista* l, const PCB* p) {
 	}	
 }
 
-void ins_fim_lista(Lista* l, const PCB* p) {
-    if (underflow_lista(l)) {
-        ins_inicio_lista(l, p);
+void insFimLista(Lista* l, const PCB* p) {
+    if (underflowLista(l)) {
+        insInicioLista(l, p);
         return;
     }
     Nodo* n = malloc(sizeof(Nodo));
@@ -89,7 +90,7 @@ void ins_fim_lista(Lista* l, const PCB* p) {
     ++l->num_nodos;
 }
 
-void rem_processo_lista(Lista* l, PCB* p, PCB* r) {
+void remProcessoLista(Lista* l, PCB* p, PCB* r) {
 	Nodo* i = l->cabeca;
 	while (i != NULL) {
 		if (memcmp(&i->processo, p, sizeof(PCB)) == 0) {
@@ -117,13 +118,25 @@ void rem_processo_lista(Lista* l, PCB* p, PCB* r) {
 	}
 }
 
+void remInicioLista(Lista* l, PCB* p) {
+	Nodo* i = l->cabeca;
+	l->cabeca = i->proximo;
+	memcpy(p, &i->processo, sizeof(PCB));
+	free(i);
+	if (l->cabeca == NULL) {
+		l->cauda = NULL;
+	} else {
+		l->cabeca->anterior = NULL;
+	}
+	--l->num_nodos;
+}
+
 bool fimES(Lista* l, PCB* p) {
 	// PCB* retorno;
 	Nodo* i = l->cabeca;
 	while (i != NULL) {
 		if(geraFimSolicitacaoES()) {
-			rem_processo_lista(l, &i->processo, p);
-			// memcpy(p, retorno, sizeof(PCB));
+			remProcessoLista(l, &i->processo, p);
 			return true;
 		} else {
 			i = i->proximo;
@@ -132,7 +145,7 @@ bool fimES(Lista* l, PCB* p) {
 	return false;
 }
 
-int tamanho_lista(const Lista* l) {
+int tamanhoLista(const Lista* l) {
 	return l->num_nodos;
 }
 
