@@ -138,6 +138,6 @@ int tamanho_lista(const Lista* l) {
 
 bool geraFimSolicitacaoES() {
 	srand((unsigned) time(NULL));
-	int flag_fim_ES = rand() % 2;
+	int flag_fim_ES = rand() % 5;
 	return flag_fim_ES == 1 ? true : false;
 }

@@ -35,12 +35,24 @@ int main(void){
 	Hora* hr_inicio = retornaHora();
 	int quantum = 10, qtd_processos = 3;
 	limpaTela();
-	printf(YELLOW BOLD"╔════════════════════════════════════════════════════════════════════════════╗\n");
-	printf("║                                BEM VINDO!                                  ║\n");
-	printf("╚════════════════════════════════════════════════════════════════════════════╝\n\n");
+	printf(YELLOW"╔══════════════════════════════════════════════════════════╗\n");
+	puts("║                     _                       _            ║");
+	puts("║  ___  ___  ___ __ _| | ___  _ __   __ _  __| | ___  _ __ ║");
+	puts("║ / _ \\/ __|/ __/ _` | |/ _ \\| '_ \\ / _` |/ _` |/ _ \\| '__|║");
+	puts("║|  __/\\__ \\ (_| (_| | | (_) | | | | (_| | (_| | (_) | |   ║");
+	puts("║ \\___||___/\\___\\__,_|_|\\___/|_| |_|\\__,_|\\__,_|\\___/|_|   ║");
+	puts("║                                                          ║");
+	puts("║     _                                                    ║");
+	puts("║  __| | ___   ___   ___                                   ║");
+	puts("║ / _` |/ _ \\ / __| / _ \\                                  ║");
+	puts("║| (_| |  __/ \\__ \\| (_) |                                 ║");
+	puts("║ \\__,_|\\___| |___(_)___(_)                                ║");
+	puts("║                                                          ║");
+	puts("╚══════════════════════════════════════════════════════════╝");
+	puts("");
 	printf(RESET" Informe o número de processos: ");
 	scanf("%d", &qtd_processos);
-	printf(" Informe a duracao do quantum (em ms): ");
+	printf(" Informe a duracao do quantum (em s): ");
 	scanf("%d", &quantum);
 	limpaTela();
 
@@ -50,6 +62,7 @@ int main(void){
 		PCB* novo = geraProcesso();
 		ins_fim_fila(pronto, novo);
 	}
+	// Executa o programa enquanto existir processos para rodar
 	while (tamanho_fila(finalizado) < qtd_processos) {
 		limpaTela();
 		printf(RESET"\nInicio do programa: %02d:%02d:%02d\n", hr_inicio->hr, hr_inicio->min, hr_inicio->sec);
@@ -57,11 +70,11 @@ int main(void){
 		printf(BOLD"║                             PROCESSOS PRONTOS                              ║\n"RESET RED);
 		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
 		printf("║ QTD de processos: %3d                                                      ║\n", tamanho_fila(pronto));
-		// printf("╠═══════════════════════════════════════════════════════════════════════════╣\n");
 		dump_fila(pronto);
 		
 		printf(RESET YELLOW "╠════════════════════════════════════════════════════════════════════════════╣\n");
 		printf(BOLD"║                            PROCESSOS EM ESPERA                             ║\n"RESET YELLOW);
+		printf("╠════════════════════════════════════════════════════════════════════════════╣\n");
 		printf("║ QTD de processos: %3d                                                      ║\n", tamanho_lista(em_espera));
 		dump_lista(em_espera);
 
@@ -74,15 +87,18 @@ int main(void){
 		
 		// Cria um novo processo, que sera trabalhado mais adiante
 		PCB* processo_da_vez = malloc(sizeof(struct pcb));
+		// PCB* processo_em_espera = malloc(sizeof(struct pcb));
 		// Pega o primeiro processo da fila de processos prontos
 		if (!underflow_fila(pronto)) {
+			// Pega o primeiro processo da fila e o coloca no processador
 			rem_inicio_fila(pronto, processo_da_vez);
 			printf(RESET"║ O processo %3d foi para o processador                                      ║\n", processo_da_vez->PID);
 			int contador = 0;
 			bool solicitou = false;
+			bool saiu_espera = false;
 			while (contador <= quantum) {
 				contador++;
-				usleep(10000);
+				sleep(1);
 				if (processo_da_vez->tempo_total == contador) {
 					processo_da_vez->tempo_total -= contador;
 					break;
@@ -92,26 +108,29 @@ int main(void){
 					ins_inicio_lista(em_espera, processo_da_vez);
 					solicitou = true;
 					break;
-				}
+				} 
+				// else if (fimES(em_espera, processo_da_vez)) {
+		 	// 		printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
+		 	// 		ins_fim_fila(pronto, processo_da_vez);
+		 	// 		saiu_espera = true;
+		 	// 		break;
+				// }
 			}
 			// desconta do tempo total o tempo que o processo ficou no processador
 			printf("║ O processo %3d executou por %3ds. Seu \"tamanho\" diminuiu para %3d.         ║\n", processo_da_vez->PID, contador, processo_da_vez->tempo_total);
-			if (!underflow_lista(em_espera)) {
-				if (fimES(em_espera, processo_da_vez)) {
-					printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
-					ins_fim_fila(pronto, processo_da_vez);
-				}
-			}
 			if (processo_da_vez->tempo_total <= 0) {
 				printf("║ O processo %3d terminou sua execucao                                       ║\n", processo_da_vez->PID);
 				finalizaProcesso(processo_da_vez);
 				ins_fim_fila(finalizado, processo_da_vez);
-			}else if (solicitou) {
-				// se o processo solicitou E/S, continua na lista de espera
-				solicitou = false;
-			} else {
-				// se o processo ainda não foi atendido, volta para a fila pronto
+			} else if (!solicitou) {
+				// se o processo nao solicitou E/S e ainda não foi atendido, volta para a fila pronto
 				ins_fim_fila(pronto, processo_da_vez);
+			} else if (!underflow_lista(em_espera)) {
+				if (fimES(em_espera, processo_da_vez)) {
+					printf("║ O processo %3d teve uma resposta para E/S                                  ║\n", processo_da_vez->PID);
+					ins_fim_fila(pronto, processo_da_vez);
+					saiu_espera = true;
+				}
 			}
 		} else {
 			printf(RESET"║ Aguardando E/S de um dos processos                                         ║\n");
@@ -123,15 +142,15 @@ int main(void){
 				}
 			}
 		}
-		// printf(RESET"Pressione qualquer tecla para continuar: ");
-		// char next;
-		// scanf(" %c", &next);
+		printf(RESET"Pressione qualquer tecla para continuar: ");
+		char next;
+		scanf(" %c", &next);
 		printf("║ Proximo processo...                                                        ║\n");
 	printf("╚════════════════════════════════════════════════════════════════════════════╝\n");
-		usleep(1000000);
+		// sleep(1);
 	}
 	printf("Finalizando...\n");
-	usleep(1000000);
+	sleep(1);
 	limpaTela();
 	printf(BOLD "\t\t\tRESUMO\n"RESET);
 	printf(GREEN"╔════════════════════════════════════════════════════════════════════════════╗\n");
