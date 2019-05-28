@@ -34,7 +34,7 @@ int main(void){
 
 	// Inicio do programa
 	Hora* hr_inicio = retornaHora();
-	int quantum, qtd_processos;
+	int quantum, qtd_processos, modo;
 	limpaTela();
 	printf(YELLOW"╔══════════════════════════════════════════════════════════╗\n");
 	puts("║                     _                       _            ║");
@@ -55,6 +55,10 @@ int main(void){
 	scanf("%d", &qtd_processos);
 	printf(" Informe a duracao do quantum (em s): ");
 	scanf("%d", &quantum);
+	while (modo != 1 && modo != 2) {
+		printf(" Escolha o modo:\n [1] Automatico\n [2] Por passos\n");
+		scanf("%d", &modo);
+	}
 	limpaTela();
 
 	// Inicializa a lista com processos prontos, na quantidade informada pelo usuário
@@ -141,12 +145,15 @@ int main(void){
 				}
 			}
 		}
-		printf(RESET"Pressione qualquer tecla para continuar: ");
-		char next;
-		scanf(" %c", &next);
-		printf("║ Proximo processo...                                                        ║\n");
-	printf("╚════════════════════════════════════════════════════════════════════════════╝\n");
-		// sleep(1);
+		if (modo == 2) {
+			printf(RESET"Pressione qualquer tecla para continuar: ");
+			char next;
+			scanf(" %c", &next);
+		} else {
+			printf("║ Proximo processo...                                                        ║\n");
+			printf("╚════════════════════════════════════════════════════════════════════════════╝\n");
+			sleep(1);
+		}
 	}
 	printf("Finalizando...\n");
 	sleep(1);
