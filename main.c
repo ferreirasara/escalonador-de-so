@@ -146,10 +146,12 @@ int main(void){
 			}
 		}
 		if (modo == 2) {
+			// Modo por passos
 			printf(RESET"Pressione qualquer tecla para continuar: ");
 			char next;
 			scanf(" %c", &next);
 		} else {
+			// Modo automatico
 			printf("║ Proximo processo...                                                        ║\n");
 			printf("╚════════════════════════════════════════════════════════════════════════════╝\n");
 			sleep(1);
@@ -158,7 +160,7 @@ int main(void){
 	printf("Finalizando...\n");
 	sleep(1);
 	limpaTela();
-	printf(BOLD "\t\t\tRESUMO\n"RESET);
+	printf(BOLD " RESUMO\n"RESET);
 	printf(GREEN"╔════════════════════════════════════════════════════════════════════════════╗\n");
 	dumpFilaFinalizado(finalizado);
 	printf("╚════════════════════════════════════════════════════════════════════════════╝\n"RESET);
