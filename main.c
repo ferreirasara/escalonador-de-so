@@ -23,7 +23,6 @@ PCB* geraProcessoVazio();
 void finalizaProcesso(PCB*);
 bool geraSolicitacaoES();
 bool geraFimSolicitacaoES();
-void limpaTela();
 
 int main(void){
 	srand((unsigned) time(NULL));
@@ -35,7 +34,7 @@ int main(void){
 	// Inicio do programa
 	Hora* hr_inicio = retornaHora();
 	int quantum, qtd_processos, modo;
-	limpaTela();
+	system("clear");
 	printf(YELLOW"╔══════════════════════════════════════════════════════════╗\n");
 	puts("║                     _                       _            ║");
 	puts("║  ___  ___  ___ __ _| | ___  _ __   __ _  __| | ___  _ __ ║");
@@ -59,7 +58,7 @@ int main(void){
 		printf(" Escolha o modo:\n [1] Automatico\n [2] Por passos\n");
 		scanf("%d", &modo);
 	}
-	limpaTela();
+	system("clear");
 
 	// Inicializa a lista com processos prontos, na quantidade informada pelo usuário
 	int i;
@@ -69,7 +68,7 @@ int main(void){
 	}
 	// Executa o programa enquanto existir processos para rodar
 	while (tamanhoFila(finalizado) < qtd_processos) {
-		limpaTela();
+		system("clear");
 		printf(RESET"\nInicio do programa: %02d:%02d:%02d\n", hr_inicio->hr, hr_inicio->min, hr_inicio->sec);
 		printf(RED"╔════════════════════════════════════════════════════════════════════════════╗\n");
 		printf(BOLD"║                             PROCESSOS PRONTOS                              ║\n"RESET RED);
@@ -159,7 +158,7 @@ int main(void){
 	}
 	printf("Finalizando...\n");
 	sleep(1);
-	limpaTela();
+	system("clear");
 	printf(BOLD " RESUMO\n"RESET);
 	printf(GREEN"╔════════════════════════════════════════════════════════════════════════════╗\n");
 	dumpFilaFinalizado(finalizado);
