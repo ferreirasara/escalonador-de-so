@@ -1,3 +1,7 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *		Código feito por Sara Cristina Ferreira		 *
+ *		Disciplina: Estrutura de Dados e Algoritmos	 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef LISTAGEN_H
 #define LISTAGEN_H
 

@@ -1,3 +1,7 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *		Código feito por Sara Cristina Ferreira		 *
+ *		Disciplina: Estrutura de Dados e Algoritmos	 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>

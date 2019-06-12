@@ -1,3 +1,7 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *		Código feito por Sara Cristina Ferreira		 *
+ *		Disciplina: Estrutura de Dados e Algoritmos	 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -196,7 +200,7 @@ void finalizaProcesso(PCB* p) {
 }
 
 bool geraSolicitacaoES() {
-	int flag_gera_ES = rand() % 4;
+	int flag_gera_ES = rand() % 6;
 	return flag_gera_ES == 0 ? true : false;
 }
 

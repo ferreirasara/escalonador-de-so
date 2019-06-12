@@ -1,3 +1,7 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *		Código feito por Sara Cristina Ferreira		 *
+ *		Disciplina: Estrutura de Dados e Algoritmos	 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifndef PCB_H
 #define PCB_H
 

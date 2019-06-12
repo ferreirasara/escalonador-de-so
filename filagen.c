@@ -1,3 +1,7 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *		Código feito por Sara Cristina Ferreira		 *
+ *		Disciplina: Estrutura de Dados e Algoritmos	 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
